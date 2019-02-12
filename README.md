@@ -16,7 +16,10 @@ try {
     let result = await MyAPI.getSomething("123");
 } catch(e){}
 ```
-
+## Install
+```
+npm i retrofit-request
+```
 ## API Declaration
 Annotations on the class methods and its parameters indicate how a request will be handled.
 
