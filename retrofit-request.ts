@@ -33,9 +33,9 @@ export var Multipart = buildContentType("Multipart", (options: any)=>{
 export var Header = buildParam("Header");
 export var Path = buildParam("Path");
 export var Query = buildParam("Query");
-export var Body = buildParam("Body");
-export var Field = Body;
-export var Part = Body;
+export var Body = buildParamAsIs("Body");
+export var Field = buildParam("Field");
+export var Part = Field;
 
 function buildContentType(type: string, installer: Function) {
     return function(targetClass: any, methodName: string, descriptor: PropertyDescriptor) {
@@ -58,6 +58,16 @@ function buildParam(type: string) {
     }
 }
 
+function buildParamAsIs(type: string) {
+    return function (targetClass: any, methodName: string | symbol, parameterIndex: number) {
+        let metadataKey = `${String(methodName)}_${type}_params`;
+        var paramObj = {
+            index: parameterIndex
+        }
+        targetClass[metadataKey] = (targetClass[metadataKey] || []).concat(paramObj);
+    } 
+}
+
 function buildMethod(method: string) {
     return function(uri: string, custom?: {timeout:number}) {
         return function(targetClass: any, methodName: string, descriptor: PropertyDescriptor) {
@@ -67,11 +77,16 @@ function buildMethod(method: string) {
             let _bodys = targetClass[`${methodName}_Body_params`] as Array<{key: string, index: number}>;
             let _headers = targetClass[`${methodName}_Header_params`] as Array<{key: string, index: number}>;
             let _contentType = targetClass[`${methodName}_ContentType`] as Function;
+            let _fields = targetClass[`${methodName}_Field_params`] as Array<{key: string, index: number}>;
             /** 
              * retrieve annoted elements from argument at runtime
             */
             function resolve_from_args(metas: any[], args: any[]): {} {
                 return metas.reduce((r, c)=>(r[c.key]=c.eval?c.eval(args[c.index]):args[c.index],r), {});
+            }
+
+            function resolve_from_args_asis(metas: any[], args: any[]): {} {
+                return metas.reduce((r, c)=>({...r, ...args[c.index]}), {});
             }
 
             function substitute(uri: string, metas: {}): string {
@@ -101,7 +116,8 @@ function buildMethod(method: string) {
                 let paths = _paths && resolve_from_args(_paths, args);
                 let querys = _querys && resolve_from_args(_querys, args);
                 let headers = _headers && resolve_from_args(_headers, args);
-                let bodys = _bodys && resolve_from_args(_bodys, args);
+                let bodys = _bodys && resolve_from_args_asis(_bodys, args);
+                let fields = _fields && resolve_from_args(_fields, args);
 
                 uri = (paths && substitute(uri, paths)) || uri;
                 let _baseuri = targetClass[`easyRequest_BaseURI`] || targetClass.prototype["easyRequest_BaseURI"] || "";
@@ -110,7 +126,7 @@ function buildMethod(method: string) {
                     timeout: 10000,
                     method: method,
                     qs: querys,
-                    body: bodys,
+                    body: {...bodys, ...fields},
                     uri: path_composite(_baseuri, uri),
                     headers: headers,
                     ...custom
