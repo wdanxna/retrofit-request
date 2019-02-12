@@ -1,0 +1,22 @@
+{
+  "name": "retrofit-request",
+  "version": "1.0.0",
+  "description": "Make http request as simple as possible",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "typescript",
+    "http",
+    "request",
+    "retrofit",
+    "decorator"
+  ],
+  "author": "danwu",
+  "license": "MIT",
+  "dependencies": {
+    "request-promise-native": "^1.0.5",
+    "typescript": "^3.2.4"
+  }
+}
