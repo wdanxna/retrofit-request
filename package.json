@@ -2,9 +2,11 @@
   "name": "retrofit-request",
   "version": "1.0.0",
   "description": "Make http request as simple as possible",
-  "main": "index.js",
+  "main": "./lib/retrofit-request.js",
+  "types": "./lib/retrofit-request.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
   },
   "keywords": [
     "typescript",
@@ -16,7 +18,11 @@
   "author": "danwu",
   "license": "MIT",
   "dependencies": {
+    "@types/request-promise-native": "^1.0.15",
     "request-promise-native": "^1.0.5",
     "typescript": "^3.2.4"
-  }
+  },
+  "files": [
+    "lib/**/*"
+  ]
 }

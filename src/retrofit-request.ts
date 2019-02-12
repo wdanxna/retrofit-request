@@ -1,4 +1,4 @@
-import request from "request-promise-native"
+import * as request from "request-promise-native"
 
 export var HTTP = function(baseURL: string) {
     return function(constructor: Function) {
@@ -89,7 +89,7 @@ function buildMethod(method: string) {
                 return metas.reduce((r, c)=>({...r, ...args[c.index]}), {});
             }
 
-            function substitute(uri: string, metas: {}): string {
+            function substitute(uri: string, metas: any): string {
                 var ret = uri;
                 Object.keys(metas).forEach(key =>{
                     ret = ret.replace(`{${key}}`, metas[key])
@@ -98,7 +98,7 @@ function buildMethod(method: string) {
             }
 
             let path_composite = (function(){
-                function composite_iter(first: boolean, ...parts: string[]) {
+                function composite_iter(first: boolean, ...parts: string[]): any {
                     if (parts.length == 0) return "";
                     var head = parts[0];
                     //remove the tailing '/' if exists
